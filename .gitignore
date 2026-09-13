@@ -1,0 +1,40 @@
+## Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio
+.vs/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.sln.docstates
+
+## Rider / JetBrains
+.idea/
+*.sln.iml
+
+## Visual Studio Code
+.vscode/
+
+## Test results
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+coverage.cobertura.xml
+coverage.opencover.xml
+
+## Publish and staging
+publish/
+**/publish/
+
+## Environment overrides / secrets locales si los hubiera
+appsettings.local.json
+appsettings.*.local.json
+
+## OS files
+.DS_Store
+Thumbs.db
+desktop.ini

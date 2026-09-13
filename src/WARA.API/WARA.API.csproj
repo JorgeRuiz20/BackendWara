@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>WARA.API</RootNamespace>
+    <UserSecretsId>a1b2c3d4-wara-api-2026</UserSecretsId>
+    <RollForward>LatestMajor</RollForward>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WARA.Domain\WARA.Domain.csproj" />
+    <ProjectReference Include="..\WARA.Application\WARA.Application.csproj" />
+    <ProjectReference Include="..\WARA.Infrastructure\WARA.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
