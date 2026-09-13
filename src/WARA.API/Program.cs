@@ -148,14 +148,6 @@ app.UseSwaggerUI(options =>
 // Redirigir la raíz al Swagger para facilidad de acceso en Render
 app.MapGet("/", () => Results.Redirect("/swagger")).AllowAnonymous();
 
-// Endpoint público GET /api/health (200 OK) para monitoreo simple / Render
-app.MapGet("/api/health", () => Results.Ok(new
-{
-    estado = "OK",
-    mensaje = "WARA API operativa",
-    timestamp = DateTime.UtcNow
-})).AllowAnonymous();
-
 app.UseCors("PermitirApp");
 
 app.UseAuthentication();
