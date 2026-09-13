@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using WARA.Application.Exceptions;
 using WARA.Domain.Entities;
@@ -32,6 +33,11 @@ namespace WARA.Application.Services
             if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(password))
             {
                 return LoginResult.Fallido("El usuario y la contraseña son obligatorios.");
+            }
+
+            if (password.Length < LongitudMinimaPassword || !password.Any(char.IsUpper) || !password.Any(ch => !char.IsLetterOrDigit(ch)))
+            {
+                return LoginResult.Fallido("La contraseña debe tener al menos 8 caracteres, incluir al menos una letra mayúscula y un símbolo (ej. @, !).");
             }
 
             var usuario = await _usuarioRepository.ObtenerPorNombreUsuarioAsync(nombreUsuario);
@@ -83,11 +89,22 @@ namespace WARA.Application.Services
             if (nombreUsuario.Trim().Length < 3)
                 throw new BusinessRuleException("El nombre de usuario debe tener al menos 3 caracteres.");
 
+            ValidarPassword(password);
+        }
+
+        private static void ValidarPassword(string password)
+        {
             if (string.IsNullOrWhiteSpace(password))
                 throw new BusinessRuleException("La contraseña es obligatoria.");
 
             if (password.Length < LongitudMinimaPassword)
                 throw new BusinessRuleException($"La contraseña debe tener al menos {LongitudMinimaPassword} caracteres.");
+
+            if (!password.Any(char.IsUpper))
+                throw new BusinessRuleException("La contraseña debe incluir al menos una letra mayúscula.");
+
+            if (!password.Any(ch => !char.IsLetterOrDigit(ch)))
+                throw new BusinessRuleException("La contraseña debe incluir al menos un símbolo (ej. @, !).");
         }
     }
 }

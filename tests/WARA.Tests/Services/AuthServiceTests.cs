@@ -43,7 +43,7 @@ namespace WARA.Tests.Services
                 .ReturnsAsync(usuario);
 
             _passwordHasherMock
-                .Setup(h => h.Verificar("claveSecreta", "hash123"))
+                .Setup(h => h.Verificar("ClaveSecreta123@", "hash123"))
                 .Returns(true);
 
             _tokenGeneratorMock
@@ -51,7 +51,7 @@ namespace WARA.Tests.Services
                 .Returns("token-jwt-simulado");
 
             // Act
-            var resultado = await _service.LoginAsync("jperez", "claveSecreta");
+            var resultado = await _service.LoginAsync("jperez", "ClaveSecreta123@");
 
             // Assert
             resultado.EsExitoso.Should().BeTrue();
@@ -68,11 +68,12 @@ namespace WARA.Tests.Services
                 .ReturnsAsync((Usuario?)null);
 
             // Act
-            var resultado = await _service.LoginAsync("noexiste", "cualquierClave");
+            var resultado = await _service.LoginAsync("noexiste", "CualquierClave123@");
 
             // Assert
             resultado.EsExitoso.Should().BeFalse();
             resultado.Token.Should().BeNull();
+            resultado.MensajeError.Should().Be("Credenciales inválidas.");
             // No debe intentar generar token si el usuario no existe
             _tokenGeneratorMock.Verify(t => t.GenerarToken(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
         }
@@ -88,11 +89,11 @@ namespace WARA.Tests.Services
                 .ReturnsAsync(usuario);
 
             _passwordHasherMock
-                .Setup(h => h.Verificar("claveIncorrecta", "hash123"))
+                .Setup(h => h.Verificar("ClaveIncorrecta123@", "hash123"))
                 .Returns(false);
 
             // Act
-            var resultado = await _service.LoginAsync("jperez", "claveIncorrecta");
+            var resultado = await _service.LoginAsync("jperez", "ClaveIncorrecta123@");
 
             // Assert
             resultado.EsExitoso.Should().BeFalse();
@@ -110,7 +111,7 @@ namespace WARA.Tests.Services
                 .ReturnsAsync(usuario);
 
             // Act
-            var resultado = await _service.LoginAsync("jperez", "cualquierClave");
+            var resultado = await _service.LoginAsync("jperez", "CualquierClave123@");
 
             // Assert
             resultado.EsExitoso.Should().BeFalse();
@@ -119,7 +120,7 @@ namespace WARA.Tests.Services
         }
 
         [Theory]
-        [InlineData("", "claveValida123")]      // usuario vacío
+        [InlineData("", "ClaveValida123@")]      // usuario vacío
         [InlineData("jperez", "")]              // password vacío
         public async Task LoginAsync_ConCamposVacios_RetornaResultadoFallidoSinConsultarRepositorio(
             string nombreUsuario, string password)
@@ -134,6 +135,20 @@ namespace WARA.Tests.Services
         }
 
         [Fact]
+        public async Task LoginAsync_ConPasswordSinMayusculaOSimbolo_RetornaResultadoFallido()
+        {
+            // Act
+            var resultado1 = await _service.LoginAsync("jperez", "clavesinmayus123");
+            var resultado2 = await _service.LoginAsync("jperez", "ClaveSinSimbolo123");
+
+            // Assert
+            resultado1.EsExitoso.Should().BeFalse();
+            resultado1.MensajeError.Should().Contain("mayúscula");
+            resultado2.EsExitoso.Should().BeFalse();
+            resultado2.MensajeError.Should().Contain("símbolo");
+        }
+
+        [Fact]
         public async Task RegistrarAsync_ConNombreUsuarioYaExistente_LanzaBusinessRuleException()
         {
             // Arrange
@@ -142,7 +157,7 @@ namespace WARA.Tests.Services
                 .ReturnsAsync(true);
 
             // Act
-            Func<Task> accion = () => _service.RegistrarAsync("jperez", "claveValida123");
+            Func<Task> accion = () => _service.RegistrarAsync("jperez", "ClaveValida123@");
 
             // Assert
             await accion.Should().ThrowAsync<BusinessRuleException>()
@@ -155,11 +170,33 @@ namespace WARA.Tests.Services
         public async Task RegistrarAsync_ConPasswordCortoDeMenosDe8Caracteres_LanzaBusinessRuleException()
         {
             // Act
-            Func<Task> accion = () => _service.RegistrarAsync("nuevoUsuario", "corta");
+            Func<Task> accion = () => _service.RegistrarAsync("nuevoUsuario", "Co@1");
 
             // Assert
             await accion.Should().ThrowAsync<BusinessRuleException>();
             _usuarioRepositoryMock.Verify(r => r.CrearAsync(It.IsAny<Usuario>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task RegistrarAsync_SinMayuscula_LanzaBusinessRuleException()
+        {
+            // Act
+            Func<Task> accion = () => _service.RegistrarAsync("nuevoUsuario", "claveminuscula123@");
+
+            // Assert
+            await accion.Should().ThrowAsync<BusinessRuleException>()
+                .WithMessage("*mayúscula*");
+        }
+
+        [Fact]
+        public async Task RegistrarAsync_SinSimbolo_LanzaBusinessRuleException()
+        {
+            // Act
+            Func<Task> accion = () => _service.RegistrarAsync("nuevoUsuario", "ClaveSinSimbolo123");
+
+            // Assert
+            await accion.Should().ThrowAsync<BusinessRuleException>()
+                .WithMessage("*símbolo*");
         }
 
         [Fact]
@@ -171,7 +208,7 @@ namespace WARA.Tests.Services
                 .ReturnsAsync(false);
 
             _passwordHasherMock
-                .Setup(h => h.Hashear("claveValida123"))
+                .Setup(h => h.Hashear("ClaveValida123@"))
                 .Returns("hashGenerado");
 
             Usuario? usuarioCreado = null;
@@ -181,7 +218,7 @@ namespace WARA.Tests.Services
                 .Returns(Task.CompletedTask);
 
             // Act
-            await _service.RegistrarAsync("nuevoUsuario", "claveValida123");
+            await _service.RegistrarAsync("nuevoUsuario", "ClaveValida123@");
 
             // Assert: la contraseña que se persiste es el HASH, nunca el texto plano
             usuarioCreado.Should().NotBeNull();

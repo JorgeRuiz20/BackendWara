@@ -8,6 +8,9 @@ namespace WARA.Application.DTOs
         public string NombreUsuario { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La contraseña es obligatoria.")]
+        [StringLength(200, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$",
+            ErrorMessage = "La contraseña debe tener al menos 8 caracteres, incluir al menos una letra mayúscula y un símbolo (ej. @, !).")]
         public string Password { get; set; } = string.Empty;
     }
 
@@ -27,6 +30,8 @@ namespace WARA.Application.DTOs
 
         [Required(ErrorMessage = "La contraseña es obligatoria.")]
         [StringLength(200, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$",
+            ErrorMessage = "La contraseña debe tener al menos 8 caracteres, incluir al menos una letra mayúscula y un símbolo (ej. @, !).")]
         public string Password { get; set; } = string.Empty;
     }
 
