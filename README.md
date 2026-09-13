@@ -32,9 +32,6 @@ WARA.Backend/
 │   │                              a Stored Procedures MySQL, PasswordHasher (BCrypt) y TokenGenerator (JWT).
 │   └── WARA.API/               → Adaptador de entrada HTTP: Controllers (Auth, Trabajadores, Health),
 │                                  Middlewares (manejo global de excepciones RFC 7807), filtros y Swagger.
-├── database/
-│   ├── script.sql              → Script original de creación.
-│   └── script_mysql.sql        → Script completo DDL/DML para MySQL 8.0 con 9 Stored Procedures.
 └── tests/
     └── WARA.Tests/             → Suite de pruebas unitarias con xUnit, Moq y FluentAssertions (27 tests).
 ```
@@ -185,11 +182,8 @@ git clone https://github.com/JorgeRuiz20/BackendWara.git
 cd BackendWara
 ```
 
-### 2. Configurar la Base de Datos
-Si utilizas una instancia MySQL local o remota propia, ejecuta el script ubicado en:
-```
-database/script_mysql.sql
-```
+### 2. Base de Datos en la Nube (Aiven Cloud)
+La solución se encuentra conectada y preconfigurada para operar contra el clúster administrado MySQL 8.0 en Aiven Cloud con cifrado SSL obligatorio y Procedimientos Almacenados activos. No requiere aprovisionamiento local salvo que se desee usar una instancia propia.
 
 ### 3. Configurar Cadena de Conexión
 Edita el archivo `src/WARA.API/appsettings.json` o establece la variable de entorno correspondiente:
